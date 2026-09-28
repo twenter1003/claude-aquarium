@@ -117,6 +117,7 @@ dialog pre { white-space: pre-wrap; font: inherit; background: #eef5fb; border-r
 dialog button { font: inherit; border: 0; background: var(--sign); color: var(--paper); border-radius: 10px; padding: 6px 14px; cursor: pointer; }
 @media (max-width: 760px) { .hall { grid-template-columns: repeat(2, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .tank .pal, .tank .zzz, .tank .bub, .tank .weed { animation: none !important; } }
+.emoji { display: inline-grid; place-items: center; width: 64px; height: 64px; font-size: 44px; line-height: 1; }
 </style>
 </head>
 <body>
@@ -203,11 +204,18 @@ const WEED = `<svg class="weed a" viewBox="0 0 22 70"><path d="M11 70 q-10 -12 0
 const PALS = [["penguin", "펭귄", "#9fdcf5"], ["dolphin", "돌고래", "#8fcff0"], ["octopus", "문어", "#a9c9f5"], ["turtle", "거북이", "#9fe0cf"],
               ["seal", "물범", "#8fc0e6"], ["otter", "수달", "#8fd9d2"], ["jelly", "해파리", "#b3b8f2"], ["hamster", "햄스터", "#9fd8f0"]];
 let TANKS = [];
+const KO = Object.fromEntries(PALS.map(([k, a]) => [k, a]).concat(PALS.map(([k, a]) => [a, k])));  // penguin↔펭귄
 function build(roles) {
-  TANKS = [["수조", roles.map((r, i) => { const [key, animal, water] = PALS[i % PALS.length]; return [r, r, animal, key, water]; })]];
+  TANKS = [["수조", roles.map((r, i) => {
+    let [key, animal, water] = PALS[i % PALS.length], want = r.animal;
+    if (want && ANIMAL[want]) [key, animal] = [want, KO[want]];                 // 영어 키
+    else if (want && ANIMAL[KO[want]]) [key, animal] = [KO[want], want];       // 한국어 이름
+    else if (want) { key = "emoji:" + want; animal = ""; }                      // 그 밖엔 이모지·글자로 그림
+    return [r.id, r.name || r.id, animal, key, water]; })]];
   INFO = Object.fromEntries(TANKS.flatMap(([, t]) => t.map(x => [x[0], x])));
 }
 let INFO = {};
+const pal = key => ANIMAL[key] || (key.startsWith("emoji:") ? `<span class="emoji">${esc(key.slice(6))}</span>` : ANIMAL.star);
 const hm = ts => (ts || "").slice(11, 16);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const who = type => INFO[type] ? `${INFO[type][1]} ${INFO[type][2]}` : (type || "손님 불가사리");
@@ -225,7 +233,7 @@ function tank([type, role, animal, key, water]) {
     <div class="say">${now ? `${esc(now.task)} <small>${hm(now.started)}부터</small>` : ""}</div>
     ${WEED}<i class="bub b1"></i><i class="bub b2"></i><i class="bub b3"></i>
     <div class="zzz">z z</div><div class="check" title="방금 끝냄">✓</div>
-    <div class="pal">${ANIMAL[key]}</div><div class="clam"><div class="lid"></div><div class="base"></div></div>
+    <div class="pal">${pal(key)}</div><div class="clam"><div class="lid"></div><div class="base"></div></div>
     <div class="sand"></div></div>`;
 }
 
@@ -249,7 +257,7 @@ function meet(guests) {
   const head = talks.map(x => `<button data-thread="${esc(x.id)}" aria-pressed="${x.id === t.id}">${esc(x.id.slice(11))}</button>`).join("")
     + (guests.length ? `<span class="guests" title="역할 밖 도우미">${guests.map(g => `<span class="guest">${ANIMAL.star}${esc(g.task)}</span>`).join("")}</span>` : "");
   const rows = t.posts.map(p => { const info = INFO[p.who]; const key = info ? info[3] : "star";
-    return `<li class="${p.who === first ? "" : "right"}">${ANIMAL[key]}<div class="msg" title="${esc(p.gist)}"><span class="who">${esc(who(p.who))} · ${esc(p.time)}<span class="kind">${esc(p.kind)}</span></span>${esc(p.say || p.gist)}</div></li>`; }).join("");
+    return `<li class="${p.who === first ? "" : "right"}">${pal(key)}<div class="msg" title="${esc(p.gist)}"><span class="who">${esc(who(p.who))} · ${esc(p.time)}<span class="kind">${esc(p.kind)}</span></span>${esc(p.say || p.gist)}</div></li>`; }).join("");
   return `<div class="meet-head">${head}</div><ol class="chat">${rows}</ol>`;
 }
 
@@ -257,7 +265,7 @@ function open(type) {
   const [, role, animal, key] = INFO[type];
   const mine = last.agents.filter(a => a.type === type).slice(-6).reverse();
   const d = document.getElementById("detail");
-  d.innerHTML = `<header>${ANIMAL[key]}<h3>${role} ${animal}의 수조</h3></header>${mine.length ? mine.map(a => `<article>
+  d.innerHTML = `<header>${pal(key)}<h3>${role} ${animal}의 수조</h3></header>${mine.length ? mine.map(a => `<article>
       <b>${a.status === "working" ? "일하는 중" : "끝냄"}</b> ${hm(a.started)}${a.ended ? "–" + hm(a.ended) : ""} · ${esc(a.task)}
       ${a.result ? `<pre>${esc(a.result)}</pre>` : a.prompt ? `<pre>${esc(a.prompt)}</pre>` : ""}</article>`).join("")
     : `<p class="empty">아직 이 수조에서 한 일이 없어요.</p>`}<p><button onclick="this.closest('dialog').close()">닫기</button></p>`;
@@ -273,7 +281,7 @@ let seen = "";
 async function poll() {
   try {
     const text = await (await fetch("/api/state", { cache: "no-store" })).text();
-    if (text !== seen) { seen = text; last = JSON.parse(text); build(last.roles || []); render(); }  // 바뀐 때만 다시 그림(애니메이션·스크롤 유지)
+    if (text !== seen) { seen = text; last = JSON.parse(text); document.title = document.querySelector("h1").textContent = last.title || document.title; build(last.roles || []); render(); }  // 바뀐 때만 다시 그림(애니메이션·스크롤 유지)
     document.getElementById("tick").textContent = new Date().toTimeString().slice(0, 8) + " 갱신";
   } catch { document.getElementById("summary").textContent = "서버에 연결하지 못했어요. Claude Code 세션을 새로 열거나 python3 server.py로 켜 주세요"; }
 }

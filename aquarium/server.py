@@ -15,6 +15,7 @@ EVENTS = Path(os.environ.get("AQUARIUM_HOME", Path.home() / ".claude-aquarium"))
 PAGE = Path(__file__).resolve().parent / "index.html"
 AGENT_ID = re.compile(r"agentId\"?:\s*\"?([0-9a-f]{8,})")  # 문장형·JSON형 결과 둘 다
 ASYNC = re.compile(r"Async agent launched|\"isAsync\": true")
+TITLE = os.environ.get("AQUARIUM_TITLE", "에이전트 아쿠아리움")
 PORT = int(os.environ.get("AQUARIUM_PORT", 8788))
 THREADS = Path(os.environ["AQUARIUM_THREADS"]) if os.environ.get("AQUARIUM_THREADS") else None
 POST = re.compile(r"^## (\d+)\. (\S+) \(([^)]*)\) — (\S+)\s*\n\*\*요지:\*\*\s*(.+)(?:\n\*\*한마디:\*\*\s*(.+))?$", re.M)
@@ -69,8 +70,18 @@ def state() -> dict:
             a["type"] = a["type"] or r["agent_type"]  # 재개로만 본 에이전트는 여기서 역할을 안다
             done(a, r, log)
     dirs = [Path.home() / ".claude"] + [Path(c) / ".claude" for c in {r.get("cwd") for r in rows} if c]
-    roles = sorted({f.stem for d in dirs for f in (d / "agents").glob("*.md")})
+    files = {f.stem: f for d in dirs for f in sorted((d / "agents").glob("*.md"))}  # 같은 이름이면 프로젝트 쪽이 이김
+    roles = [{"id": k, **front(f)} for k, f in sorted(files.items())]
     return {"roles": roles, "agents": list(agents.values()), "log": log[-40:][::-1], "talks": talks()}
+
+
+FRONT = re.compile(r"^(aquarium_name|aquarium_animal):\s*(.+?)\s*$", re.M)
+
+
+def front(f: Path) -> dict:
+    """에이전트 파일 frontmatter의 aquarium_name(표시 이름)·aquarium_animal(동물 키 또는 이모지)."""
+    head = f.read_text().split("---")[1] if f.read_text().startswith("---") else ""
+    return {k.removeprefix("aquarium_"): v.strip("\"'") for k, v in FRONT.findall(head)}
 
 
 def done(a: dict, r: dict, log: list) -> None:
@@ -83,7 +94,7 @@ def done(a: dict, r: dict, log: list) -> None:
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         if self.path.startswith("/api/state"):
-            body, ctype = json.dumps(state(), ensure_ascii=False).encode(), "application/json"
+            body, ctype = json.dumps({**state(), "title": TITLE}, ensure_ascii=False).encode(), "application/json"
         else:
             body, ctype = PAGE.read_bytes(), "text/html; charset=utf-8"
         self.send_response(200)
