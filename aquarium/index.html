@@ -128,7 +128,36 @@ dialog button { font: inherit; border: 0; background: var(--sign); color: var(--
 :root[data-theme=cafe] { --deep: #3b2a20; --deep2: #7a5a44; --frame: #a07a58; --frame-dark: #6e4f36; --sign: #4a3325;
   --sand: #c79a6b; --weed: #6b9e5a; --prop: #fff4e2; --prop2: #e9d6b8; --glow: #ffe2a8; --meet: linear-gradient(#f5e6d0, #e6cfae); }
 :root[data-theme=cafe] .tank { --water: #f3e3cc !important; }
-:root[data-theme=space] body::before { background: radial-gradient(#fff 1px, transparent 1.5px) 0 0 / 40px 40px; opacity: .25; }
+/* 테마별 장식·효과: 해초 대신 --deco 글자, 조개 대신 --thing, 거품 대신 --fx */
+.deco, .thing { display: none; position: absolute; font-style: normal; line-height: 1; pointer-events: none; }
+:root:not([data-theme=sea]) .weed, :root:not([data-theme=sea]) .clam { display: none; }
+:root:not([data-theme=sea]) .deco { display: block; bottom: 22px; font-size: 26px; }
+.deco.d1 { left: 10px; } .deco.d2 { right: 12px; font-size: 20px !important; }
+.deco.d1::before { content: var(--deco1); } .deco.d2::before { content: var(--deco2); }
+:root:not([data-theme=sea]) .thing { display: block; bottom: 26px; left: calc(50% + 14px); font-size: 30px; filter: grayscale(.6) brightness(.8); transition: filter .6s; }
+.thing::before { content: var(--thing); }
+.tank.working .thing { filter: drop-shadow(0 0 8px var(--glow)); }
+:root:not([data-theme=sea]) .bub { border: 0; width: auto; height: auto; font-size: 14px; color: var(--glow); }
+:root:not([data-theme=sea]) .bub::before { content: var(--fx); }
+.tank.working .deco { animation: sway 3s ease-in-out infinite alternate; transform-origin: bottom; }
+
+:root[data-theme=space] { --deco1: "🪐"; --deco2: "🌙"; --thing: "📡"; --fx: "✦"; }
+:root[data-theme=space] .tank.working .bub { animation: twinkle 1.6s ease-in-out infinite; bottom: auto; top: 30%; }
+:root[data-theme=space] .bub.b2 { top: 55% !important; } :root[data-theme=space] .bub.b3 { top: 20% !important; }
+:root[data-theme=space] .rays { opacity: .5; background: radial-gradient(#fff 1px, transparent 1.6px) 0 0 / 46px 46px,
+  radial-gradient(#fff 1px, transparent 1.4px) 23px 17px / 71px 71px; animation: twinkle 4s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: .2; transform: scale(.7); } 50% { opacity: 1; transform: scale(1.2); } }
+
+:root[data-theme=forest] { --deco1: "🌲"; --deco2: "🍄"; --thing: "🍯"; --fx: "🍃"; }
+:root[data-theme=forest] .tank.working .bub { animation: fall 3.6s linear infinite; bottom: auto; top: 0; }
+@keyframes fall { 0% { transform: translate(0, 0) rotate(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(-24px, 120px) rotate(200deg); opacity: 0; } }
+:root[data-theme=forest] .rays { opacity: .22; background: repeating-linear-gradient(75deg, transparent 0 80px, #fff6b0 80px 96px, transparent 96px 190px); }
+
+:root[data-theme=cafe] { --deco1: "🪴"; --deco2: "📚"; --thing: "☕"; --fx: "~"; }
+:root[data-theme=cafe] .bub { font-size: 20px !important; color: #fff !important; }
+:root[data-theme=cafe] .bub.b1, :root[data-theme=cafe] .bub.b2, :root[data-theme=cafe] .bub.b3 { left: calc(50% + 24px); bottom: 58px; }
+:root[data-theme=cafe] .rays { opacity: .3; background: radial-gradient(circle at 50% -10%, #ffd9a0 0, transparent 55%); }
+@media (prefers-reduced-motion: reduce) { .rays, .tank .deco { animation: none !important; } }
 </style>
 <link rel="stylesheet" href="/theme.css">
 </head>
@@ -215,11 +244,13 @@ const WEED = `<svg class="weed a" viewBox="0 0 22 70"><path d="M11 70 q-10 -12 0
 // 에이전트 이름 순서대로 동물·물색을 돌려 쓴다. 정의 파일이 없는 에이전트(general-purpose 등)는 회의 수조의 손님 불가사리.
 const PALS = [["penguin", "펭귄", "#9fdcf5"], ["dolphin", "돌고래", "#8fcff0"], ["octopus", "문어", "#a9c9f5"], ["turtle", "거북이", "#9fe0cf"],
               ["seal", "물범", "#8fc0e6"], ["otter", "수달", "#8fd9d2"], ["jelly", "해파리", "#b3b8f2"], ["hamster", "햄스터", "#9fd8f0"]];
+const CAST = { space: ["👩‍🚀", "🚀", "👽", "🛸", "🛰️", "🤖", "☄️", "🌟"], forest: ["🦊", "🐻", "🦉", "🐿️", "🦔", "🐰", "🦌", "🐸"],
+               cafe: ["🧑‍🍳", "🧁", "🥐", "🍰", "🍩", "🧋", "🍪", "🐈"] };  // 캐릭터를 안 정한 에이전트의 테마별 기본값
 let TANKS = [];
 const KO = Object.fromEntries(PALS.map(([k, a]) => [k, a]).concat(PALS.map(([k, a]) => [a, k])));  // penguin↔펭귄
 function build(roles) {
   TANKS = [["수조", roles.map((r, i) => {
-    let [key, animal, water] = PALS[i % PALS.length], want = r.animal;
+    let [key, animal, water] = PALS[i % PALS.length], want = r.animal || CAST[last.theme]?.[i % 8];
     if (want && ANIMAL[want]) [key, animal] = [want, KO[want]];                 // 영어 키
     else if (want && ANIMAL[KO[want]]) [key, animal] = [KO[want], want];       // 한국어 이름
     else if (want) { key = "emoji:" + want; animal = ""; }                      // 그 밖엔 이모지·글자로 그림
@@ -234,6 +265,7 @@ const who = type => INFO[type] ? `${INFO[type][1]} ${INFO[type][2]}` : (type || 
 let last = { agents: [], log: [] };
 
 function tank([type, role, animal, key, water]) {
+  [type, role, animal] = [type, role, animal].map(esc);  // 에이전트 파일에서 온 값
   const mine = last.agents.filter(a => a.type === type);
   const busy = mine.filter(a => a.status === "working");
   const recent = mine.filter(a => a.status === "done").at(-1);
@@ -243,7 +275,7 @@ function tank([type, role, animal, key, water]) {
       data-type="${type}" style="--water:${water}" aria-label="${role} ${animal} 수조, ${busy.length ? "일하는 중" : "쉬는 중"}">
     <span class="plate">${role} <small>${animal}</small></span>${busy.length > 1 ? `<span class="count">${busy.length}마리 일하는 중</span>` : ""}
     <div class="say">${now ? `${esc(now.task)} <small>${hm(now.started)}부터</small>` : ""}</div>
-    ${WEED}<i class="bub b1"></i><i class="bub b2"></i><i class="bub b3"></i>
+    ${WEED}<i class="deco d1"></i><i class="deco d2"></i><i class="thing"></i><i class="bub b1"></i><i class="bub b2"></i><i class="bub b3"></i>
     <div class="zzz">z z</div><div class="check" title="방금 끝냄">✓</div>
     <div class="pal">${pal(key)}</div><div class="clam"><div class="lid"></div><div class="base"></div></div>
     <div class="sand"></div></div>`;
@@ -267,14 +299,15 @@ function meet(guests) {
   const t = talks.find(x => x.id === pick) || talks[0];
   const first = t.posts[0]?.who;
   const head = talks.map(x => `<button data-thread="${esc(x.id)}" aria-pressed="${x.id === t.id}">${esc(x.id.slice(11))}</button>`).join("")
-    + (guests.length ? `<span class="guests" title="역할 밖 도우미">${guests.map(g => `<span class="guest">${ANIMAL.star}${esc(g.task)}</span>`).join("")}</span>` : "");
+    + (guests.length ? `<span class="guests" title="역할 밖 도우미">${guests.map(g => `<span class="guest">${pal({ space: "emoji:⭐", forest: "emoji:🐞", cafe: "emoji:🍬" }[last.theme] || "star")}${esc(g.task)}</span>`).join("")}</span>` : "");
   const rows = t.posts.map(p => { const info = INFO[p.who]; const key = info ? info[3] : "star";
     return `<li class="${p.who === first ? "" : "right"}">${pal(key)}<div class="msg" title="${esc(p.gist)}"><span class="who">${esc(who(p.who))} · ${esc(p.time)}<span class="kind">${esc(p.kind)}</span></span>${esc(p.say || p.gist)}</div></li>`; }).join("");
   return `<div class="meet-head">${head}</div><ol class="chat">${rows}</ol>`;
 }
 
 function open(type) {
-  const [, role, animal, key] = INFO[type];
+  let [, role, animal, key] = INFO[type];
+  [role, animal] = [role, animal].map(esc);
   const mine = last.agents.filter(a => a.type === type).slice(-6).reverse();
   const d = document.getElementById("detail");
   d.innerHTML = `<header>${pal(key)}<h3>${role} ${animal}의 수조</h3></header>${mine.length ? mine.map(a => `<article>

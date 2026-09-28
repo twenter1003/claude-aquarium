@@ -25,15 +25,22 @@ aquarium_animal: 펭귄        # 없으면 순서대로 배정
 ```
 `aquarium_animal`에는 기본 그림 8종(펭귄 penguin, 돌고래 dolphin, 문어 octopus, 거북이 turtle, 물범 seal, 수달 otter, 해파리 jelly, 햄스터 hamster)을 한국어나 영어로 쓰거나, 아무 이모지(🚀, 🤖, 🐱…)를 쓸 수 있다.
 ## 테마
-`AQUARIUM_THEME`로 배경을 고른다: `sea`(기본, 바다) · `space`(우주) · `forest`(숲) · `cafe`(카페).
-이모지·제목과 함께 바꾸면 컨셉이 통째로 바뀐다. 예: `AQUARIUM_THEME=space AQUARIUM_TITLE="우주 정거장"` + 🚀·🛰️·👽.
+`AQUARIUM_THEME` 하나로 배경·캐릭터·장식·효과가 함께 바뀐다. `aquarium_animal`을 정한 에이전트는 그 캐릭터를 유지한다.
+
+| 테마 | 기본 캐릭터 | 장식 | 일할 때 효과 |
+|---|---|---|---|
+| `sea` (기본) | 펭귄·돌고래·문어… | 해초·조개 | 거품 |
+| `space` | 👩‍🚀🚀👽🛸🛰️🤖☄️🌟 | 🪐🌙📡 | 별 반짝임 |
+| `forest` | 🦊🐻🦉🐿️🦔🐰🦌🐸 | 🌲🍄🍯 | 나뭇잎 떨어짐 |
+| `cafe` | 🧑‍🍳🧁🥐🍰🍩🧋🍪🐈 | 🪴📚☕ | 커피 김 |
 
 직접 만들려면 CSS 파일을 `AQUARIUM_CSS`로 준다. 아래 변수만 덮어써도 된다.
 ```css
 :root { --deep: #102030; --deep2: #304050;   /* 페이지 배경 위·아래 */
         --frame: #556; --frame-dark: #334; --sign: #223;  /* 수조 틀·간판 */
         --sand: #ccb; --weed: #6a6; --prop: #fcd; --prop2: #fbc;  /* 바닥·풀·소품 */
-        --glow: #ffe; --meet: #ddd; }
+        --glow: #ffe; --meet: #ddd;
+        --deco1: "🌵"; --deco2: "🪨"; --thing: "💎"; --fx: "✨"; }  /* 장식·효과 글자 (sea 말고 다른 테마 위에서) */
 .tank { --water: #cde !important; }         /* 수조 물색 */
 ```
 
