@@ -51,9 +51,9 @@ main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 48px; position: rel
 @keyframes sway { to { transform: skewX(-8deg); } }
 .clam { position: absolute; bottom: 22px; left: calc(50% + 10px); width: 48px; height: 40px; }
 .clam .lid { position: absolute; left: 4px; right: 4px; top: 0; height: 26px; border-radius: 10px 10px 4px 4px;
-  background: #f7c8d8; border: 3px solid var(--ink); }
+  background: var(--prop, #f7c8d8); border: 3px solid var(--ink); }
 .clam .base { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; border-radius: 4px 4px 20px 20px;
-  background: #f3b3c8; border: 3px solid var(--ink); }
+  background: var(--prop2, #f3b3c8); border: 3px solid var(--ink); }
 .tank.working .clam .lid { background: var(--glow); box-shadow: 0 0 14px var(--glow); }
 .pal { position: absolute; bottom: 20px; left: calc(50% - 58px); width: 66px; height: 66px; z-index: 2; }
 .pal svg { width: 100%; height: 100%; overflow: visible; }
@@ -82,7 +82,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 48px; position: rel
 .tank.fresh .check { display: grid; }
 
 .meet { grid-column: 1 / -1; border-radius: 14px; border: 5px solid var(--frame-dark); padding: 12px 14px 16px;
-  background: linear-gradient(#bfe6f5, #9fd0ea); position: relative; }
+  background: var(--meet, linear-gradient(#bfe6f5, #9fd0ea)); position: relative; }
 .meet-head { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 10px; }
 .meet-head button { font: inherit; font-size: 13px; border: 2px solid var(--frame-dark); background: var(--paper); color: var(--ink);
   border-radius: 99px; padding: 2px 10px; cursor: pointer; }
@@ -118,7 +118,19 @@ dialog button { font: inherit; border: 0; background: var(--sign); color: var(--
 @media (max-width: 760px) { .hall { grid-template-columns: repeat(2, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .tank .pal, .tank .zzz, .tank .bub, .tank .weed { animation: none !important; } }
 .emoji { display: inline-grid; place-items: center; width: 64px; height: 64px; font-size: 44px; line-height: 1; }
+/* 테마: AQUARIUM_THEME=sea|space|forest|cafe. 수조 물색은 테마가 정하면 캐릭터별 물색보다 우선한다 */
+:root[data-theme=space] { --deep: #0a0624; --deep2: #241a55; --frame: #3b2f7a; --frame-dark: #221a4f; --sign: #150f3a;
+  --sand: #9a94b8; --weed: #c7b8ff; --prop: #ffd76a; --prop2: #f0b94a; --glow: #fff3a8; --meet: linear-gradient(#2e2466, #1c1545); }
+:root[data-theme=space] .tank { --water: #1b1446 !important; }
+:root[data-theme=forest] { --deep: #1f3d22; --deep2: #4f7d3f; --frame: #7a5a36; --frame-dark: #553d22; --sign: #3d2b17;
+  --sand: #7b5a3a; --weed: #2f8f4e; --prop: #e8604c; --prop2: #c94a3a; --glow: #fff6b0; --meet: linear-gradient(#d9ecc8, #b8d9a0); }
+:root[data-theme=forest] .tank { --water: #bfe3b0 !important; }
+:root[data-theme=cafe] { --deep: #3b2a20; --deep2: #7a5a44; --frame: #a07a58; --frame-dark: #6e4f36; --sign: #4a3325;
+  --sand: #c79a6b; --weed: #6b9e5a; --prop: #fff4e2; --prop2: #e9d6b8; --glow: #ffe2a8; --meet: linear-gradient(#f5e6d0, #e6cfae); }
+:root[data-theme=cafe] .tank { --water: #f3e3cc !important; }
+:root[data-theme=space] body::before { background: radial-gradient(#fff 1px, transparent 1.5px) 0 0 / 40px 40px; opacity: .25; }
 </style>
+<link rel="stylesheet" href="/theme.css">
 </head>
 <body>
 <div class="rays"></div>
@@ -281,7 +293,7 @@ let seen = "";
 async function poll() {
   try {
     const text = await (await fetch("/api/state", { cache: "no-store" })).text();
-    if (text !== seen) { seen = text; last = JSON.parse(text); document.title = document.querySelector("h1").textContent = last.title || document.title; build(last.roles || []); render(); }  // 바뀐 때만 다시 그림(애니메이션·스크롤 유지)
+    if (text !== seen) { seen = text; last = JSON.parse(text); document.title = document.querySelector("h1").textContent = last.title || document.title; document.documentElement.dataset.theme = last.theme || "sea"; build(last.roles || []); render(); }  // 바뀐 때만 다시 그림(애니메이션·스크롤 유지)
     document.getElementById("tick").textContent = new Date().toTimeString().slice(0, 8) + " 갱신";
   } catch { document.getElementById("summary").textContent = "서버에 연결하지 못했어요. Claude Code 세션을 새로 열거나 python3 server.py로 켜 주세요"; }
 }

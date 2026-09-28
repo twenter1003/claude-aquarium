@@ -16,6 +16,8 @@ PAGE = Path(__file__).resolve().parent / "index.html"
 AGENT_ID = re.compile(r"agentId\"?:\s*\"?([0-9a-f]{8,})")  # 문장형·JSON형 결과 둘 다
 ASYNC = re.compile(r"Async agent launched|\"isAsync\": true")
 TITLE = os.environ.get("AQUARIUM_TITLE", "에이전트 아쿠아리움")
+THEME = os.environ.get("AQUARIUM_THEME", "sea")
+CSS = Path(os.environ["AQUARIUM_CSS"]) if os.environ.get("AQUARIUM_CSS") else None  # 직접 만든 테마
 PORT = int(os.environ.get("AQUARIUM_PORT", 8788))
 THREADS = Path(os.environ["AQUARIUM_THREADS"]) if os.environ.get("AQUARIUM_THREADS") else None
 POST = re.compile(r"^## (\d+)\. (\S+) \(([^)]*)\) — (\S+)\s*\n\*\*요지:\*\*\s*(.+)(?:\n\*\*한마디:\*\*\s*(.+))?$", re.M)
@@ -94,7 +96,9 @@ def done(a: dict, r: dict, log: list) -> None:
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         if self.path.startswith("/api/state"):
-            body, ctype = json.dumps({**state(), "title": TITLE}, ensure_ascii=False).encode(), "application/json"
+            body, ctype = json.dumps({**state(), "title": TITLE, "theme": THEME}, ensure_ascii=False).encode(), "application/json"
+        elif self.path.startswith("/theme.css"):
+            body, ctype = (CSS.read_bytes() if CSS and CSS.is_file() else b""), "text/css"
         else:
             body, ctype = PAGE.read_bytes(), "text/html; charset=utf-8"
         self.send_response(200)
