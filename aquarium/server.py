@@ -95,6 +95,9 @@ def done(a: dict, r: dict, log: list) -> None:
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
+        if self.headers.get("Host", "").rsplit(":", 1)[0] not in ("127.0.0.1", "localhost"):  # DNS 리바인딩 차단
+            self.send_error(403)
+            return
         if self.path.startswith("/api/state"):
             body, ctype = json.dumps({**state(), "title": TITLE, "theme": THEME}, ensure_ascii=False).encode(), "application/json"
         elif self.path.startswith("/theme.css"):

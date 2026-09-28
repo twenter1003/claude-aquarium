@@ -44,7 +44,7 @@ def main() -> None:
         row["result"] = clip(h.get("tool_response", ""))
     elif ev == "SubagentStop":
         row["result"] = clip(h.get("last_assistant_message", "") or "")
-    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.parent.mkdir(mode=0o700, parents=True, exist_ok=True)  # 프롬프트 일부가 담기니 나만 읽게
     with OUT.open("a") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
