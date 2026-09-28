@@ -1,0 +1,5 @@
+{
+  "name": "claude-aquarium",
+  "owner": { "name": "twenter1003" },
+  "plugins": [{ "name": "claude-aquarium", "source": "./", "description": "서브에이전트 아쿠아리움 대시보드" }]
+}

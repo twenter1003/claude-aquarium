@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "(nohup python3 \"${CLAUDE_PLUGIN_ROOT}/aquarium/server.py\" >/dev/null 2>&1 &) ; true" }] }
+    ],
+    "PreToolUse": [
+      { "matcher": "Agent|Task|SendMessage", "hooks": [{ "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/aquarium/events.py\" 2>/dev/null || true", "async": true }] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Agent|Task|SendMessage", "hooks": [{ "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/aquarium/events.py\" 2>/dev/null || true", "async": true }] }
+    ],
+    "SubagentStop": [
+      { "hooks": [{ "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/aquarium/events.py\" 2>/dev/null || true", "async": true }] }
+    ]
+  }
+}
