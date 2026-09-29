@@ -3,11 +3,21 @@
 Claude Code 서브에이전트가 일하는 모습을 수조 속 동물로 보여 주는 로컬 대시보드. 표준 라이브러리 파이썬만 쓰고, 데이터는 내 컴퓨터 밖으로 나가지 않는다.
 
 ## 설치
-```
-/plugin marketplace add twenter1003/claude-aquarium
-/plugin install claude-aquarium@claude-aquarium
-```
-세션을 새로 열면 서버가 자동으로 뜬다 → http://127.0.0.1:8788 (`/aquarium`으로도 켤 수 있다). python3 필요.
+Claude Code에서 명령어를 **한 줄씩 따로** 실행한다. 두 줄을 한꺼번에 붙여 넣으면 안 된다.
+
+1. 마켓플레이스 추가
+   ```
+   /plugin marketplace add twenter1003/claude-aquarium
+   ```
+2. 플러그인 설치
+   ```
+   /plugin install claude-aquarium@claude-aquarium
+   ```
+3. Claude Code 세션을 새로 연다. 서버가 자동으로 켜진다 → http://127.0.0.1:8788 (`/aquarium`으로도 켤 수 있다)
+
+`/plugin` 메뉴의 **Add Marketplace** 입력창을 쓴다면 `twenter1003/claude-aquarium`만 입력한다. 설치 명령어까지 같이 넣으면 "not a valid GitHub owner/repo" 오류가 난다.
+
+필요한 것: python3
 
 ## 동작
 - 훅이 서브에이전트 시작·끝을 `~/.claude-aquarium/events.jsonl`에 쌓는다(프롬프트·결과는 앞 600자만).
