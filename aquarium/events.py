@@ -11,12 +11,12 @@ from datetime import datetime
 from pathlib import Path
 
 OUT = Path(os.environ.get("AQUARIUM_HOME", Path.home() / ".claude-aquarium")) / "events.jsonl"
-CLIP = 600
+CLIP = int(os.environ.get("AQUARIUM_CLIP", 600))  # 0이면 프롬프트·결과를 남기지 않음
 
 
 def clip(v) -> str:
     s = v if isinstance(v, str) else json.dumps(v, ensure_ascii=False)
-    return s if len(s) <= CLIP else s[:CLIP] + " …"
+    return s if len(s) <= CLIP else s[:CLIP] + " …" if CLIP else ""
 
 
 def main() -> None:
@@ -45,7 +45,8 @@ def main() -> None:
     elif ev == "SubagentStop":
         row["result"] = clip(h.get("last_assistant_message", "") or "")
     OUT.parent.mkdir(mode=0o700, parents=True, exist_ok=True)  # 프롬프트 일부가 담기니 나만 읽게
-    with OUT.open("a") as f:
+    OUT.parent.chmod(0o700)  # 예전에 만든 폴더도
+    with os.fdopen(os.open(OUT, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600), "a") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 

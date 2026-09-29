@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>에이전트 아쿠아리움</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
 :root {
   --deep: #0b2a4a; --deep2: #134a6e; --frame: #2f6f8f; --frame-dark: #1d4c66; --sign: #0e3d5c;
@@ -16,18 +14,18 @@
   :root { --deep: #8fd3f0; --deep2: #d4f1fb; --frame: #5aa9c9; --frame-dark: #3f8bab; --sign: #2f7da0; }
 }
 * { box-sizing: border-box; }
-body { margin: 0; min-height: 100vh; font-family: "Gowun Dodum", system-ui, sans-serif; color: var(--ink);
+body { margin: 0; min-height: 100vh; font-family: system-ui, sans-serif; color: var(--ink);
   background: linear-gradient(var(--deep), var(--deep2)) fixed; }
 .rays { position: fixed; inset: 0; pointer-events: none; opacity: .18;
   background: repeating-linear-gradient(100deg, transparent 0 60px, #ffffff 60px 70px, transparent 70px 150px); }
 main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 48px; position: relative; }
 .sign { background: var(--sign); color: var(--paper); border-radius: 22px 22px 0 0; padding: 14px 22px;
   display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.sign h1 { font-family: "Jua", sans-serif; font-weight: 400; font-size: 30px; margin: 0; }
+.sign h1 { font-family: system-ui, sans-serif; font-weight: 400; font-size: 30px; margin: 0; }
 .sign p { margin: 0; font-size: 14px; opacity: .9; }
 .hall { background: var(--frame); padding: 14px; border: 6px solid var(--frame-dark); border-top: 0;
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.zone { grid-column: 1 / -1; font-family: "Jua", sans-serif; color: var(--paper); opacity: .85; font-size: 14px; margin: 2px 4px -4px; }
+.zone { grid-column: 1 / -1; font-family: system-ui, sans-serif; color: var(--paper); opacity: .85; font-size: 14px; margin: 2px 4px -4px; }
 
 /* 수조 */
 .tank { position: relative; height: 200px; border-radius: 14px; overflow: hidden; cursor: pointer;
@@ -39,10 +37,10 @@ main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 48px; position: rel
 .tank.working::after { content: ""; position: absolute; top: 0; left: 15%; right: 15%; height: 80px;
   background: radial-gradient(ellipse at top, #ffffffa0, transparent 70%); pointer-events: none; }
 .plate { position: absolute; top: 10px; left: 10px; background: var(--paper); border-radius: 10px; padding: 2px 9px;
-  font-family: "Jua", sans-serif; font-size: 15px; z-index: 3; }
-.plate small { font-family: "Gowun Dodum", sans-serif; color: var(--muted); font-size: 12px; }
+  font-family: system-ui, sans-serif; font-size: 15px; z-index: 3; }
+.plate small { font-family: system-ui, sans-serif; color: var(--muted); font-size: 12px; }
 .count { position: absolute; top: 10px; right: 10px; background: var(--glow); border-radius: 99px; padding: 1px 8px;
-  font-family: "Jua", sans-serif; font-size: 13px; z-index: 3; }
+  font-family: system-ui, sans-serif; font-size: 13px; z-index: 3; }
 .sand { position: absolute; left: 0; right: 0; bottom: 0; height: 30px; background: var(--sand);
   border-radius: 50% 50% 0 0 / 14px 14px 0 0; }
 .weed { position: absolute; bottom: 20px; width: 22px; height: 70px; }
@@ -68,7 +66,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 48px; position: rel
 .bub.b1 { left: 30%; } .bub.b2 { left: 62%; animation-delay: 1.1s !important; width: 6px; height: 6px; }
 .bub.b3 { left: 78%; animation-delay: 2.2s !important; }
 @keyframes rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
-.zzz { position: absolute; bottom: 92px; left: calc(50% - 30px); font-family: "Jua", sans-serif; color: var(--paper);
+.zzz { position: absolute; bottom: 92px; left: calc(50% - 30px); font-family: system-ui, sans-serif; color: var(--paper);
   font-size: 15px; display: none; z-index: 2; }
 .tank.idle .zzz { display: block; animation: float 2.6s ease-in-out infinite; }
 @keyframes float { 50% { transform: translate(6px, -8px); opacity: .6; } }
@@ -93,7 +91,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 48px; position: rel
 .chat svg { width: 44px; height: 44px; flex: none; }
 .chat .msg { background: var(--paper); border-radius: 16px 16px 16px 4px; padding: 7px 11px; font-size: 14px; line-height: 1.45; }
 .chat li.right .msg { border-radius: 16px 16px 4px 16px; background: #fffbe8; }
-.chat .who { font-family: "Jua", sans-serif; font-size: 13px; color: var(--muted); display: block; margin-bottom: 2px; }
+.chat .who { font-family: system-ui, sans-serif; font-size: 13px; color: var(--muted); display: block; margin-bottom: 2px; }
 .chat .kind { display: inline-block; font-size: 12px; background: #e3f1fa; border-radius: 6px; padding: 0 6px; margin-left: 4px; }
 .guests { margin-left: auto; display: flex; gap: 6px; }
 .lobby { grid-column: 1 / -1; min-height: 70px; background: #00000026; border-radius: 12px; padding: 10px;
@@ -102,11 +100,11 @@ main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 48px; position: rel
 .guest svg { width: 26px; height: 26px; }
 .base { height: 18px; background: var(--frame-dark); border-radius: 0 0 12px 12px; }
 section.log { margin-top: 26px; background: var(--paper); border-radius: 18px; padding: 16px 20px; }
-.log h2 { font-family: "Jua", sans-serif; font-weight: 400; font-size: 22px; margin: 0 0 8px; }
+.log h2 { font-family: system-ui, sans-serif; font-weight: 400; font-size: 22px; margin: 0 0 8px; }
 .log ol { list-style: none; margin: 0; padding: 0; max-height: 340px; overflow: auto; }
 .log li { padding: 6px 0; border-bottom: 1px dashed #d8e4ee; font-size: 14px; display: flex; gap: 10px; }
 .log time { color: var(--muted); min-width: 44px; }
-.log b { font-family: "Jua", sans-serif; font-weight: 400; }
+.log b { font-family: system-ui, sans-serif; font-weight: 400; }
 .empty { color: var(--muted); }
 dialog { border: 0; border-radius: 18px; max-width: 560px; width: calc(100% - 32px); padding: 18px 20px; background: var(--paper); color: var(--ink); }
 dialog header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
@@ -116,7 +114,7 @@ dialog header svg { width: 48px; height: 48px; }
 .pick button:last-child { line-height: 1.4; padding: 6px 10px !important; }
 .pick svg, .pick .emoji { width: 34px !important; height: 34px !important; font-size: 24px; }
 .pick input { width: 90px; font: inherit; padding: 5px 8px; border: 2px solid #d8e4ee; border-radius: 10px; }
-dialog h3 { font-family: "Jua", sans-serif; font-weight: 400; font-size: 22px; margin: 0; }
+dialog h3 { font-family: system-ui, sans-serif; font-weight: 400; font-size: 22px; margin: 0; }
 dialog article { border-top: 1px dashed #d8e4ee; padding: 8px 0; font-size: 14px; }
 dialog pre { white-space: pre-wrap; font: inherit; background: #eef5fb; border-radius: 8px; padding: 8px; margin: 6px 0 0; max-height: 160px; overflow: auto; }
 dialog button { font: inherit; border: 0; background: var(--sign); color: var(--paper); border-radius: 10px; padding: 6px 14px; cursor: pointer; }
